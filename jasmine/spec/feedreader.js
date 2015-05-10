@@ -13,6 +13,9 @@ $(function() {
     * a related set of tests. This suite is all about the RSS
     * feeds definitions, the allFeeds variable in our application.
     */
+	var menu_class = ".menu";
+	var menu_button_class = ".menu-icon-link";
+	
     describe('RSS Feeds', function() {
         /* This is our first test - it tests to make sure that the
          * allFeeds variable has been defined and that it is not
@@ -58,11 +61,19 @@ $(function() {
          * the CSS to determine how we're performing the
          * hiding/showing of the menu element.
          */
-    	 it('is hidden by default', function() {
-    		 expect($('body').hasClass('menu-hidden')).toBe(true);
+    	 it('exists and has a class of \"' + menu_class + '\"', function() {
+    		expect($(menu_class).length).toBeTruthy(); 
     	 });
+    	
+    	 it('is hidden by default', function() {
+    		 expect($(menu_class).isVisible()).toBe(false);// See "$.fn.isVisible()" function at bottom
+    	 });
+    	 
+    	 it('has a menu icon with a class of \"' + menu_button_class + '\"', function() {
+			 expect($(menu_button_class).length).toBeTruthy();
+		 })
 
-         /* TODO: Write a test that ensures the menu changes
+		 /* TODO: Write a test that ensures the menu changes
           * visibility when the menu icon is clicked. This test
           * should have two expectations: does the menu display when
           * clicked and does it hide when clicked again.
@@ -73,17 +84,28 @@ $(function() {
     		  * Seeing is believing ;)
     		  */
     		 beforeEach(function(done) {
-			    setTimeout(function() {
-			      $('.menu-icon-link').trigger('click');
-			      done();
-			    }, 1500);
+    			 setTimeout(function() {
+    				 $(menu_button_class).trigger('click');
+    				 // NOTE: per the CSS for the ".menu" class, the transition will take .2s to complete.
+        			 // We Must wait for it to finish (after the 'click' event) before checking position
+    				 setTimeout(function() {
+        				 done();
+    			    }, 300);
+    			 }, 1000);
 			  });
+    		 /* NOTE: the following tests check the position of the ".menu" element
+    		  * to verify that it's actually extending into the <body>. The only assumptions 
+    		  * needed for this is that elements of class '.menu' and ".menu-icon-link" exist.
+    		  * A simpler (but possibly less robust) test would be to 
+    		  * check to see if the <body> has a class of "menu-hidden". However, if at some
+    		  * point a different method (other than "toggleClass()") was used to display/hide the menu, this test could break 
+    		  */
     		  it('displays the menu when clicked first time', function(done) {
-	       		  expect($('body').hasClass('menu-hidden')).toBe(false);
+    			  expect($(menu_class).isVisible()).toBe(true);
 	       		  done();
        	  	 });
     		 it('hides the menu when clicked again', function(done) {
-	    		expect($('body').hasClass('menu-hidden')).toBe(true);
+    			 expect($(menu_class).isVisible()).toBe(false);
 	    		done();
 	    	 });
 	      });    	 
@@ -106,4 +128,18 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
+    
+    
+    
+    
+    
+    
+    
+    /* Simple test to determine whether or not the right edge of an element 
+     * extends into its parent
+     * if the left edge + the width is <= 0, it will not be visible
+     */
+    $.fn.isVisible = function() {
+    	return((this.position().left + parseInt(this.css('width'),10)) > 0);
+    }
 }());
