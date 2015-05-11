@@ -72,8 +72,6 @@ function loadFeed(id, cb) {
             entries.forEach(function(entry) {
                 container.append(entryTemplate(entry));
             });
-        } else {
-        	console.log("Feed error: " + result.error);
         }
 
         if (cb) {
@@ -117,12 +115,10 @@ $(function() {
      * (following the link) from occuring.
      */
     feedList.on('click', 'a', function() {
-    	
         var item = $(this);
-        console.log('id ' + item.data('id') + " clicked");
+
         $('body').addClass('menu-hidden');
         loadFeed(item.data('id'));
-        
         return false;
     });
 
