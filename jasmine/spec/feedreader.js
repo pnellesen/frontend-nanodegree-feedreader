@@ -124,17 +124,20 @@ $(function() {
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
     	
-    	// Let's first empty out the .feed-list <ul>, call loadFeed again, and verify that .feed-list has an .entry element
+    	// Let's first empty out the .feed-list <ul>, select the first link again, and verify that .feed-list has an .entry element
+    	// This test requires no a priori knowledge about loadFeed at all - we test to make sure that the when
+    	// a link in the menu is selected, the feed container is populated with at least one .entry element.
     	beforeEach(function(done) {
     		$(entry_container).empty();
     		setTimeout(function() {
-				 loadFeed(0);
+				 //loadFeed(0);
+    			$('.feed-list li:nth-child(' + 1 + ') a').trigger('click');
 				 setTimeout(function() {
 					 done();
 			    }, 1000);
 		    }, 1000);
     	});
-    	it('clears the current entries, calls loadFeed again, and repopulates the entries', function(done) {
+    	it('clears the current entries, selects the first link again, and repopulates the entries', function(done) {
     		expect($(entry_container).has(entry_class).length).toBeTruthy();
     		done();
     	});
@@ -152,7 +155,7 @@ $(function() {
 		beforeEach(function(done) {
     		// let's actually open the menu with a click, wait a second, then
     		// trigger a click on the 2nd anchor tag in the feed-list, THEN check to see if .feed has at least one .entry
-    		// Doing it this way doesn't require any knowledge of inner workings or parameters of the "loadFeed" function
+    		// AGain, doing it this way doesn't require any knowledge of the inner workings or parameters of the "loadFeed" function
     		// What we're really testing is whether or not the content of the page changes when the feed changes. 
     		console.log("Start loadFeed call");
     		setTimeout(function() {
