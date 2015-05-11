@@ -15,6 +15,8 @@ $(function() {
     */
 	var menu_class = ".menu";
 	var menu_button_class = ".menu-icon-link";
+	var entry_container = ".feed";
+	var entry_class = ".entry";
 	
     describe('RSS Feeds', function() {
         /* This is our first test - it tests to make sure that the
@@ -114,24 +116,69 @@ $(function() {
 
 
     /* TODO: Write a new test suite named "Initial Entries" */
-
+    describe('Initial Entries', function() {
         /* TODO: Write a test that ensures when the loadFeed
          * function is called and completes its work, there is at least
          * a single .entry element within the .feed container.
          * Remember, loadFeed() is asynchronous so this test wil require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
+    	
+    	// Let's first empty out the .feed-list <ul>, call loadFeed again, and verify that .feed-list has an .entry element
+    	beforeEach(function(done) {
+    		$(entry_container).empty();
+    		setTimeout(function() {
+				 loadFeed(0);
+				 setTimeout(function() {
+					 done();
+			    }, 1000);
+		    }, 1000);
+    	});
+    	it('clears the current entries, calls loadFeed again, and repopulates the entries', function(done) {
+    		expect($(entry_container).has(entry_class).length).toBeTruthy();
+    		done();
+    	});
+    });
 
-    /* TODO: Write a new test suite named "New Feed Selection"
 
+    /* TODO: Write a new test suite named "New Feed Selection" */
+	describe('New Feed Selection', function() {
         /* TODO: Write a test that ensures when a new feed is loaded
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
-    
-    
-    
-    
+		var initialContent = '';
+		var newContent = '';
+		beforeEach(function(done) {
+    		// let's actually open the menu with a click, wait a second, then
+    		// trigger a click on the 2nd anchor tag in the feed-list, THEN check to see if .feed has at least one .entry
+    		// Doing it this way doesn't require any knowledge of inner workings or parameters of the "loadFeed" function
+    		// What we're really testing is whether or not the content of the page changes when the feed changes. 
+    		console.log("Start loadFeed call");
+    		setTimeout(function() {
+    			initialContent = $(entry_container).html();
+				 $(menu_button_class).trigger('click');
+				 setTimeout(function() {
+    				 $('.feed-list li:nth-child(' + 2 + ') a').trigger('click');// per JQuery docs, "nth-child" are "1-indexed" rather than "0 indexed"
+    				 setTimeout(function() {
+        				 newContent = $(entry_container).html();
+        				 done();    					 
+    				 },1000);
+			    }, 1000);
+		    }, 1000);
+    		
+    		//loadFeed(1,done());// Per app.js, loadFeed takes a callback function as 2nd parameter. Let's send "done()"
+    	});
+    	it('opens the menu, selects the 2nd link, and populates page with new',function(done) {
+    		 console.log("initial content: " + initialContent);
+    		 console.log("newContent: " + newContent);
+    		
+    		 expect($(entry_container).has(entry_class).length).toBeTruthy();
+    		 expect(initialContent === newContent).toBe(false);
+    		 done();
+    	 });
+	});
+	/* --- END TEST SUITES --- */
     
     
     
