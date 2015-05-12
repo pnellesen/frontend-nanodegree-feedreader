@@ -93,7 +93,7 @@ $(function() {
     				 setTimeout(function() {
         				 done();
     			    }, 300);
-    			 }, 1000);
+    			 }, 500);
 			  });
     		 /* NOTE: the following tests check the position of the ".menu" element
     		  * to verify that it's actually extending into the <body>. The only assumptions 
@@ -123,24 +123,35 @@ $(function() {
          * Remember, loadFeed() is asynchronous so this test wil require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
-    	
-    	// Let's first empty out the .feed-list <ul>, select the first link again, and verify that .feed-list has an .entry element
-    	// This test requires no a priori knowledge about loadFeed at all - we test to make sure that the when
-    	// a link in the menu is selected, the feed container is populated with at least one .entry element.
-    	beforeEach(function(done) {
-    		$(entry_container).empty();
-    		setTimeout(function() {
-				 //loadFeed(0);
-    			$('.feed-list li:nth-child(' + 1 + ') a').trigger('click');
-				 setTimeout(function() {
-					 done();
-			    }, 1000);
-		    }, 1000);
+    	it('has a function named loadFeed()', function() {
+    		expect(loadFeed).toBeDefined();
     	});
-    	it('clears the current entries, selects the first link again, and repopulates the entries', function(done) {
-    		expect($(entry_container).has(entry_class).length).toBeTruthy();
-    		done();
+    	it('has a container with class \"' + entry_container + '\"', function() {
+    		expect($(entry_container).length).toBeTruthy();
     	});
+    	/* We've already tested that allFeeds exists and has at least one url to check
+    	 * Let's first empty out the .feed-list <ul>, run loadFeed(0) again 
+    	 * and verify that .feed-list has at least one .entry element.
+    	 * 
+    	 * NOTE: if all we want to test here is that the .feed container has at least one entry after the page 
+    	 * has loaded, then we don't need to reload the entries in this manner
+    	 */
+    	describe('Reload entries', function() {
+        	beforeEach(function(done) {
+        		$(entry_container).empty();
+        		setTimeout(function() {
+    				 loadFeed(0);
+    				 setTimeout(function() {
+    					 done();
+    			    }, 500);
+    		    }, 500);
+        	});
+        	it('clears the current entries, runs loadFeed(0) again, and repopulates the entries', function(done) {
+        		expect($(entry_container).has(entry_class).length).toBeTruthy();
+        		done();
+        	});    		
+    	});
+
     });
 
 
@@ -150,37 +161,53 @@ $(function() {
          * by the loadFeed function that the content actually changes.
          * Remember, loadFeed() is asynchronous.
          */
-		var initialContent = '';
-		var newContent = '';
-		beforeEach(function(done) {
-    		// let's actually open the menu with a click, wait a second, then
-    		// trigger a click on the 2nd anchor tag in the feed-list, THEN check to see if .feed has at least one .entry
-    		// AGain, doing it this way doesn't require any knowledge of the inner workings or parameters of the "loadFeed" function
-    		// What we're really testing is whether or not the content of the page changes when the feed changes. 
-    		console.log("Start loadFeed call");
-    		setTimeout(function() {
-    			initialContent = $(entry_container).html();
-				 $(menu_button_class).trigger('click');
-				 setTimeout(function() {
-    				 $('.feed-list li:nth-child(' + 2 + ') a').trigger('click');// per JQuery docs, "nth-child" are "1-indexed" rather than "0 indexed"
-    				 setTimeout(function() {
-        				 newContent = $(entry_container).html();
-        				 done();    					 
-    				 },1000);
-			    }, 1000);
-		    }, 1000);
-    		
-    		//loadFeed(1,done());// Per app.js, loadFeed takes a callback function as 2nd parameter. Let's send "done()"
-    	});
-    	it('opens the menu, selects the 2nd link, and populates page with new',function(done) {
-    		 console.log("initial content: " + initialContent);
-    		 console.log("newContent: " + newContent);
-    		
-    		 expect($(entry_container).has(entry_class).length).toBeTruthy();
-    		 expect(initialContent === newContent).toBe(false);
-    		 done();
-    	 });
+		
+		/* We previously tested that the allFeeds object was defined
+		 * and that it had at least one url/name. Since it's
+		 * probably not likely that the content of a particular feed will change
+		 * within the timespan these tests will run, let's make sure we have at least 
+		 * two different feeds to compare.
+		 */
+		it('has more than one feed to select', function() {
+			expect(allFeeds.length > 1).toBe(true);
+		});
+		it('2nd feed is different than first', function() {
+			expect(allFeeds[0].url === allFeeds[1].url).toBe(false);
+		});
+		
+		describe('2nd Feed Selection', function() {
+			var initialContent = '';
+			var newContent = '';
+			beforeEach(function(done) {
+	    		// let's first save the content of the .feed container, then 
+	    		// fire off loadFeed(1) to get the 2nd feed. Give it 500ms to finish,
+	    		// then save the content of the .feed container into a new object.
+				// Finally, compare the two objects - if they're not identical, the content has changed.
+	    		console.log("Start loadFeed call");
+	    		setTimeout(function() {
+	    			initialContent = $(entry_container).html();
+					 setTimeout(function() {
+						 loadFeed(1);
+	    				 setTimeout(function() {
+	        				 newContent = $(entry_container).html();
+	        				 done();    					 
+	    				 },500);
+				    }, 500);
+			    }, 500);
+	    	});
+	    	it('loads the 2nd feed and populates the page with new content',function(done) {
+	    		 console.log("initial content: " + initialContent);
+	    		 console.log("newContent: " + newContent);
+	    		
+	    		 expect($(entry_container).has(entry_class).length).toBeTruthy();
+	    		 expect(initialContent === newContent).toBe(false);
+	    		 done();
+	    	 });
+		});
+		
 	});
+	
+	
 	/* --- END TEST SUITES --- */
     
     
