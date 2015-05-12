@@ -88,8 +88,13 @@ $(function() {
     		 beforeEach(function(done) {
     			 setTimeout(function() {
     				 $(menu_button_class).trigger('click');
-    				 // NOTE: per the CSS for the ".menu" class, the transition will take .2s to complete.
-        			 // We Must wait for it to finish (after the 'click' event) before checking position
+    				 
+    				 /* NOTE 1: per the CSS for the ".menu" class, the transition will take .2s to complete.
+        			  * We must wait for it to finish (after the 'click' event) before checking position.
+    				  * NOTE 2: This test should be somewhat "layout/style" agnostic - if some other method
+    				  * of displaying/hiding the menu is used in the future, waiting a short time after the click event
+    				  * before checking shouldn't be a problem and in fact may be beneficial.
+    				  */
     				 setTimeout(function() {
         				 done();
     			    }, 300);
