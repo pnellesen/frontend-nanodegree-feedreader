@@ -73,7 +73,7 @@ $(function() {
     	 
     	 it('has a menu icon with a class of \"' + menu_button_class + '\"', function() {
 			 expect($(menu_button_class).length).toBeTruthy();
-		 })
+		 });
 
 		 /* TODO: Write a test that ensures the menu changes
           * visibility when the menu icon is clicked. This test
