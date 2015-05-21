@@ -223,5 +223,5 @@ $(function() {
      */
     $.fn.isVisible = function() {
     	return((this.position().left + parseInt(this.css('width'),10)) > 0);
-    }
+    };
 }());
